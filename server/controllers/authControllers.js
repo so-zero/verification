@@ -2,6 +2,7 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/userModel");
 const HttpError = require("../models/errorModel");
 const { generateToken } = require("../utils/generateToken");
+const { verificationEmail } = require("../mailtrap/emails");
 
 // Register
 async function register(req, res, next) {
@@ -35,6 +36,8 @@ async function register(req, res, next) {
     await user.save();
 
     generateToken(res, user._id);
+
+    await verificationEmail(user.email, verificationToken);
 
     res.status(201).json({
       success: true,
