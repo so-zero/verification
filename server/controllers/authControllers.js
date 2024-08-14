@@ -204,6 +204,24 @@ async function resetPassword(req, res, next) {
   }
 }
 
+// Check Auth
+async function checkAuth(req, res, next) {
+  try {
+    const user = await User.findById(req.userId).select("-password");
+
+    if (!user) {
+      return next(new HttpError("유저를 찾을 수 없습니다.", 400));
+    }
+
+    res.status(200).json({
+      success: true,
+      user,
+    });
+  } catch (error) {
+    new HttpError("유저를 찾을 수 없습니다.", 400);
+  }
+}
+
 module.exports = {
   register,
   login,
@@ -211,4 +229,5 @@ module.exports = {
   verifyEmail,
   forgotPassword,
   resetPassword,
+  checkAuth,
 };
