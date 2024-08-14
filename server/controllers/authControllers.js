@@ -1,8 +1,13 @@
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 const User = require("../models/userModel");
 const HttpError = require("../models/errorModel");
 const { generateToken } = require("../utils/generateToken");
-const { verificationEmail, WelcomeEmail } = require("../mailtrap/emails");
+const {
+  verificationEmail,
+  welcomeEmail,
+  resetPasswordEmail,
+} = require("../mailtrap/emails");
 
 // Register
 async function register(req, res, next) {
@@ -52,7 +57,7 @@ async function register(req, res, next) {
   }
 }
 
-// VerifyEmail
+// Verify Email
 async function verifyEmail(req, res, next) {
   try {
     const { code } = req.body;
@@ -73,7 +78,7 @@ async function verifyEmail(req, res, next) {
     user.verificationTokenExpiresAt = undefined;
     await user.save();
 
-    await WelcomeEmail(user.email, user.name);
+    await welcomeEmail(user.email, user.name);
 
     res.status(200).json({
       success: true,
@@ -128,4 +133,38 @@ async function logout(req, res, next) {
   res.status(200).json({ success: true, message: "로그아웃 되었습니다." });
 }
 
-module.exports = { register, verifyEmail, login, logout };
+// Forgot Password
+async function forgotPassword(req, res, next) {
+  try {
+    const { email } = req.body;
+
+    const newEmail = email.toLowerCase();
+
+    const user = await User.findOne({ email: newEmail });
+    if (!user) {
+      return next(new HttpError("잘못된 이메일주소입니다.", 400));
+    }
+
+    const resetToken = crypto.randomBytes(20).toString("hex");
+    const resetTokenExpiresAt = Date.now() + 1 * 60 * 60 * 1000; // 1 hour
+
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpiresAt = resetTokenExpiresAt;
+
+    await user.save();
+
+    await resetPasswordEmail(
+      user.email,
+      `${process.env.FRONTEND_URL}/reset-password/${resetToken}`
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "비밀번호 재설정 메일이 발송되었습니다.",
+    });
+  } catch (error) {
+    new HttpError("비밀번호 재설정 메일 발송에 실패하였습니다.", 400);
+  }
+}
+
+module.exports = { register, login, logout, verifyEmail, forgotPassword };
