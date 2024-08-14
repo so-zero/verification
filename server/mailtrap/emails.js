@@ -24,4 +24,27 @@ async function verificationEmail(email, verificationToken) {
   }
 }
 
-module.exports = { verificationEmail };
+
+async function WelcomeEmail(email, name) {
+  const recipient = [{ email }];
+  
+  try {
+    const response =  await mailtrapClient.send({
+      from: sender,
+      to: recipient,
+      template_uuid: "f9a7608a-6ecd-4678-9238-0964503815f1",
+      template_variables: {
+        company_info_name: "Auth Company",
+        name: name,
+      },
+    });
+
+    console.log("이메일이 성공적으로 발송되었습니다.", response);
+    
+  } catch (error) {
+      console.error(`이메일 발송 에러`, error);
+      return next(new HttpError(`이메일 발송 에러: ${error}`));
+  }
+}
+
+module.exports = { verificationEmail, WelcomeEmail };
