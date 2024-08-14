@@ -88,8 +88,41 @@ async function verifyEmail(req, res, next) {
   }
 }
 
-async function login(req, res, next) {}
+// Login
+async function login(req, res, next) {
+  try {
+    const { email, password } = req.body;
 
+    const newEmail = email.toLowerCase();
+
+    const user = await User.findOne({ email: newEmail });
+    if (!user) {
+      return next(new HttpError("잘못된 이메일주소입니다.", 400));
+    }
+
+    const comparePassword = await bcrypt.compare(password, user.password);
+    if (!comparePassword) {
+      return next(new HttpError("잘못된 비밀번호입니다.", 400));
+    }
+
+    generateToken(res, user._id);
+
+    user.lastLogin = new Date();
+
+    res.status(200).json({
+      success: true,
+      message: "로그인 되었습니다.",
+      user: {
+        ...user._doc,
+        password: undefined,
+      },
+    });
+  } catch (error) {
+    new HttpError("로그인에 실패했습니다. 계정을 다시 확인해 주세요.", 400);
+  }
+}
+
+// Logout
 async function logout(req, res, next) {
   res.clearCookie("token");
   res.status(200).json({ success: true, message: "로그아웃 되었습니다." });
