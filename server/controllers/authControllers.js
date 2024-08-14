@@ -89,6 +89,10 @@ async function verifyEmail(req, res, next) {
 }
 
 async function login(req, res, next) {}
-async function logout(req, res, next) {}
+
+async function logout(req, res, next) {
+  res.clearCookie("token");
+  res.status(200).json({ success: true, message: "로그아웃 되었습니다." });
+}
 
 module.exports = { register, verifyEmail, login, logout };
