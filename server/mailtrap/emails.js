@@ -2,6 +2,7 @@ const { mailtrapClient, sender } = require("./mailtrap");
 const {
   VERIFICATION_EMAIL_TEMPLATE,
   PASSWORD_RESET_REQUEST_TEMPLATE,
+  PASSWORD_RESET_SUCCESS_TEMPLATE,
 } = require("./emailTemplates");
 const HttpError = require("../models/errorModel");
 
@@ -55,8 +56,8 @@ async function resetPasswordEmail(email, resetURL) {
     const response = await mailtrapClient.send({
       from: sender,
       to: recipient,
-      subject: "비밀번호 재설정",
-      html: PASSWORD_RESET_REQUEST_TEMPLATE.replace("{resetURL}", resetURL),
+      subject: "비밀번호 재설정 성공",
+      html: PASSWORD_RESET_SUCCESS_TEMPLATE.replace("{resetURL}", resetURL),
       category: "Password Reset",
     });
 
@@ -67,4 +68,28 @@ async function resetPasswordEmail(email, resetURL) {
   }
 }
 
-module.exports = { verificationEmail, welcomeEmail, resetPasswordEmail };
+async function resetSuccessEmail(email) {
+  const recipient = [{ email }];
+
+  try {
+    const response = await mailtrapClient.send({
+      from: sender,
+      to: recipient,
+      subject: "비밀번호 재설정",
+      html: PASSWORD_RESET_REQUEST_TEMPLATE,
+      category: "Password Reset",
+    });
+
+    console.log("Email sent successfully", response);
+  } catch (error) {
+    console.error(`비밀번호 재설정 성공 에러`, error);
+    return next(new HttpError(`비밀번호 재설정 성공 에러: ${error}`));
+  }
+}
+
+module.exports = {
+  verificationEmail,
+  welcomeEmail,
+  resetPasswordEmail,
+  resetSuccessEmail,
+};

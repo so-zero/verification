@@ -7,6 +7,7 @@ const {
   verificationEmail,
   welcomeEmail,
   resetPasswordEmail,
+  resetSuccessEmail,
 } = require("../mailtrap/emails");
 
 // Register
@@ -167,4 +168,47 @@ async function forgotPassword(req, res, next) {
   }
 }
 
-module.exports = { register, login, logout, verifyEmail, forgotPassword };
+// Reset Password
+async function resetPassword(req, res, next) {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpiresAt: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return next(
+        new HttpError("유효하지 않거나 만료된 재설정 토큰입니다.", 400)
+      );
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    user.password = hashedPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpiresAt = undefined;
+    await user.save();
+
+    await resetSuccessEmail(user.email);
+
+    res.status(200).json({
+      success: true,
+      message: "비밀번호 재설정이 완료되었습니다.",
+    });
+  } catch (error) {
+    new HttpError("비밀번호 재설정에 실패하였습니다.", 400);
+  }
+}
+
+module.exports = {
+  register,
+  login,
+  logout,
+  verifyEmail,
+  forgotPassword,
+  resetPassword,
+};
