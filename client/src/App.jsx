@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import EmailVerify from "./pages/EmailVerify";
+import Loading from "./components/Loading";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/authStore";
 
@@ -37,6 +38,8 @@ function App() {
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
+
+  if (isCheckingAuth) return <Loading />;
 
   return (
     <BrowserRouter>
