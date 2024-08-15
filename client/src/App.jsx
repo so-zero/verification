@@ -5,6 +5,7 @@ import Register from "./pages/Register";
 import Login from "./pages/Login";
 import EmailVerify from "./pages/EmailVerify";
 import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Loading from "./components/Loading";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/authStore";
@@ -75,6 +76,14 @@ function App() {
           element={
             <RedirectUser>
               <ForgotPassword />
+            </RedirectUser>
+          }
+        />
+        <Route
+          path="/reset-password/:token"
+          element={
+            <RedirectUser>
+              <ResetPassword />
             </RedirectUser>
           }
         />
