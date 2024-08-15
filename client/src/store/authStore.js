@@ -11,6 +11,7 @@ export const useAuthStore = create((set) => ({
   error: null,
   isLoading: false,
   isCheckingAuth: true,
+  message: null,
 
   register: async (name, email, password) => {
     set({ isLoading: true, error: null });
@@ -104,6 +105,23 @@ export const useAuthStore = create((set) => ({
       set({
         error: "로그아웃 에러",
         isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  forgotPassword: async (email) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await axios.post(`${URL}/forgot-password`, { email });
+      set({
+        message: response.data.message,
+        isLoading: false,
+      });
+    } catch (error) {
+      set({
+        isLoading: false,
+        error: error.response.data.message || "비밀번호 재설정 에러",
       });
       throw error;
     }

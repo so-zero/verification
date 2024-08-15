@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import EmailVerify from "./pages/EmailVerify";
+import ForgotPassword from "./pages/ForgotPassword";
 import Loading from "./components/Loading";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/authStore";
@@ -69,6 +70,14 @@ function App() {
           }
         />
         <Route path="/verify-email" element={<EmailVerify />} />
+        <Route
+          path="/forgot-password"
+          element={
+            <RedirectUser>
+              <ForgotPassword />
+            </RedirectUser>
+          }
+        />
       </Routes>
       <Toaster />
     </BrowserRouter>
