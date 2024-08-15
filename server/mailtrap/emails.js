@@ -56,12 +56,12 @@ async function resetPasswordEmail(email, resetURL) {
     const response = await mailtrapClient.send({
       from: sender,
       to: recipient,
-      subject: "비밀번호 재설정 성공",
-      html: PASSWORD_RESET_SUCCESS_TEMPLATE.replace("{resetURL}", resetURL),
+      subject: "비밀번호 재설정",
+      html: PASSWORD_RESET_REQUEST_TEMPLATE.replace("{resetURL}", resetURL),
       category: "Password Reset",
     });
 
-    console.log("Email sent successfully", response);
+    console.log("이메일이 성공적으로 발송되었습니다.", response);
   } catch (error) {
     console.error(`비밀번호 재설정 에러`, error);
     return next(new HttpError(`비밀번호 재설정 에러: ${error}`));
@@ -75,12 +75,12 @@ async function resetSuccessEmail(email) {
     const response = await mailtrapClient.send({
       from: sender,
       to: recipient,
-      subject: "비밀번호 재설정",
-      html: PASSWORD_RESET_REQUEST_TEMPLATE,
+      subject: "비밀번호 재설정 성공",
+      html: PASSWORD_RESET_SUCCESS_TEMPLATE,
       category: "Password Reset",
     });
 
-    console.log("Email sent successfully", response);
+    console.log("이메일이 성공적으로 발송되었습니다.", response);
   } catch (error) {
     console.error(`비밀번호 재설정 성공 에러`, error);
     return next(new HttpError(`비밀번호 재설정 성공 에러: ${error}`));
