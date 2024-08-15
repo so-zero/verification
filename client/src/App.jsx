@@ -3,6 +3,7 @@ import Home from "./pages/Home";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import EmailVerify from "./pages/EmailVerify";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/verify-email" element={<EmailVerify />} />
       </Routes>
+      <Toaster />
     </BrowserRouter>
   );
 }

@@ -1,11 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../store/authStore";
+import toast from "react-hot-toast";
 
 const EmailVerify = () => {
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const inputRefs = useRef([]);
   const navigate = useNavigate();
-  const isLoading = false;
+  const { verifyEmail, error, isLoading } = useAuthStore();
 
   const handleChange = (index, value) => {
     const newCode = [...code];
@@ -36,10 +38,17 @@ const EmailVerify = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const verificationCode = code.join("");
-    console.log(`인증코드: ${verificationCode}`);
+
+    try {
+      await verifyEmail(verificationCode);
+      navigate("/");
+      toast.success("이메일 인증이 완료되었습니다.");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
@@ -70,11 +79,14 @@ const EmailVerify = () => {
               />
             ))}
           </div>
+          {error && (
+            <p className="text-sm text-red-500 font-bold mt-2">{error}</p>
+          )}
           <button
             type="submit"
             className="mt-7 w-full py-3 px-4 bg-black text-white rounded-md hover:bg-gray-600 transition duration-200"
           >
-            {isLoading ? "확인 중..." : "이메일 확인"}
+            {isLoading ? "확인 중..." : "이메일 인증 완료"}
           </button>
         </form>
       </div>
