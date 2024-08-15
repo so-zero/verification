@@ -2,14 +2,17 @@ import React, { useState } from "react";
 import Input from "../components/Input";
 import { Mail, Lock, Loader } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useAuthStore } from "../store/authStore";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const isLoading = false;
+  const { login, error, isLoading } = useAuthStore();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+
+    await login(email, password);
   };
 
   return (
@@ -39,6 +42,9 @@ const Login = () => {
               비밀번호 찾기
             </Link>
           </div>
+          {error && (
+            <p className="text-sm text-red-500 text-bold mt-2">{error}</p>
+          )}
           <button
             type="submit"
             disabled={isLoading}
