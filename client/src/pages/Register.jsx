@@ -1,16 +1,26 @@
 import React, { useState } from "react";
 import Input from "../components/Input";
-import { UserRound, Mail, Lock } from "lucide-react";
-import { Link } from "react-router-dom";
+import { UserRound, Mail, Lock, Loader } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import PasswordForm from "../components/PasswordForm";
+import { useAuthStore } from "../store/authStore";
 
 const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { register, error, isLoading } = useAuthStore();
+  const navigate = useNavigate();
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
+
+    try {
+      await register(name, email, password);
+      navigate("/verify-email");
+    } catch (error) {
+      console.log(error);
+    }
   };
   return (
     <div className="min-h-screen max-w-lg mx-auto flex flex-col justify-center items-center">
@@ -38,12 +48,20 @@ const Register = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+          {error && (
+            <p className="text-sm text-red-500 font-semibold mt-2 ">{error}</p>
+          )}
           <PasswordForm password={password} />
           <button
             type="submit"
+            disabled={isLoading}
             className="mt-5 w-full py-3 px-4 bg-black text-white rounded-md hover:bg-gray-600 transition duration-200"
           >
-            회원가입
+            {isLoading ? (
+              <Loader className="w-6 h-6 animate-spin mx-auto" />
+            ) : (
+              "회원가입"
+            )}
           </button>
         </form>
       </div>
